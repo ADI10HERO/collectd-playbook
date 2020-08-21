@@ -1,0 +1,76 @@
+---
+
+- hosts: localhost
+  vars_prompt:
+    - name: host_name
+      prompt: "Enter host_name for collectd configuration"
+      private: no
+
+  tasks:
+  # Dependency check
+  - name: Check and install dependencies
+    yum:
+      name: ['docker','python-docker-py']
+      state: present
+
+  - name: Install pip
+    yum: 
+      name: python-pip 
+      state: present
+
+  - name: install docker-py
+    pip: name=docker-py
+
+  # Using opnfv barometer to build collectd image ############################
+  - name: Cloning barometer
+    git:
+      repo: https://gerrit.opnfv.org/gerrit/barometer
+      dest: /tmp/barometer
+
+  # Change directory and copy config
+  - name: Changing directory
+    command: ls
+    args:
+      chdir: /tmp/barometer/docker/barometer-collectd
+
+  # Build Docker Image ######################
+  - name: Building docker image
+    docker_image:
+      name: opnfv/barometer-collectd
+      build:
+        path: /tmp/barometer/docker/barometer-collectd
+        args:
+          http_proxy: \`echo $http_proxy\`
+          https_proxy: \`echo $https_proxy\`
+      source: build
+
+  # Creating directory
+  - name: Create Folder
+    file: 
+      path: /tmp/barometer/docker/src/collectd_sample_configs
+      state: directory
+
+  # Configuring collectd #######################
+  - name: Ensure collectd is configured
+    template:
+      src: collectd.conf.j2
+      dest: /tmp/barometer/docker/src/collectd_sample_configs/collectd.conf
+
+  # Running collectd #######################
+  - name: Running collectd
+    docker_container:
+      name: collectd
+      image: opnfv/barometer-collectd
+      privileged: yes
+      volumes:
+      - /tmp:/tmp
+      - /tmp/barometer/docker/src/collectd_sample_configs:/opt/collectd/etc/collectd.conf.d
+      - /var/run:/var/run
+      networks:
+      - name: host
+      command: /run_collectd.sh
+      state: started
+
+  # Check if Collectd is running ###########
+  - name: Check if collectd is running
+    shell: docker ps
