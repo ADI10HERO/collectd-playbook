@@ -5,41 +5,59 @@
     - name: host_name
       prompt: "Enter host_name for collectd configuration"
       private: no
-    - name: server_ip
-      prompt: "Enter server ip (probably of collectd-exporter) Eg. 10.10.120.211"
-      private: no
-    - name: server_port
-      prompt: "Enter port on which data is to be sent (default is 20826, or custom like 30826)"
-      private: no
 
   tasks:
-
-  # Installing epel-release and collectd ############################
-  - name: Installing Collectd
+  # Dependency check
+  - name: Check and install dependencies
     yum:
-      name: ['epel-release', 'collectd']
+      name: ['docker','python-docker-py']
       state: present
 
+  - name: Install pip
+    apt: name=python-pip state=present
+
+  - name: install docker-py
+    pip: name=docker-py
+
+  # Using opnfv barometer to build collectd image ############################
+  - name: Cloning barometer
+    git:
+      repo: https://gerrit.opnfv.org/gerrit/barometer
+      dest: /tmp/barometer
+  
   # Configuring collectd #######################
   - name: Ensure collectd is configured
     template:
       src: collectd.conf.j2
-      dest: /etc/collectd.conf
+      dest: /tmp/barometer/docker/src/collectd_sample_configs/collectd.conf
 
-  # Starting collectd ######################
+  # Change directory and copy config
+  - name: Changing directory
+    command: ls
+    args:
+      chdir: /tmp/barometer/docker/barometer-collectd
 
-  - name: Starting Collectd service
-    service:
-      name: "{{ item }}"
+  # Build Docker Image ######################
+  - name: Building docker image
+    docker_image:
+      path: .
+      state: build
+
+  # Running collectd #######################
+  - name: Running collectd
+    docker_continer:
+      name: collectd
+      image: opnfv/barometer-collectd
+      privileged: yes
+      volumes:
+      - /tmp:/tmp
+      - /tmp/barometer/docker/src/collectd_sample_configs:/opt/collectd/etc/collectd.conf.d
+      - /var/run:/var/run
+      networks:
+      - name: host
+      command: /run_collectd.sh
       state: started
-      enabled: yes
-    with_items:
-      - collectd
 
-  # - name: Stopping Collectd service
-  #   service:
-  #     name: "{{ item }}"
-  #     state: stopped
-  #     enabled: yes
-  #   with_items:
-  #     - collectd
+  # Check if Collectd is running ###########
+  - name: Check if collectd is running
+    shell: docker ps
