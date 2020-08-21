@@ -26,7 +26,7 @@
   - name: Ensure collectd is configured
     template:
       src: collectd.conf.j2
-      dest: /etc/collect.conf
+      dest: /etc/collectd.conf
 
   #Restarting collectd ######################
   - name: Stopping Collectd service
