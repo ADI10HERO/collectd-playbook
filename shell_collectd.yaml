@@ -34,8 +34,9 @@
   # Build collectd 
   - name: Downlaod and Build Image  
     command: chdir=/tmp/ {{ item }}
+    become: true
     with_items:
-    - sudo docker build -t opnfv/barometer-collectd --build-arg http_proxy=`echo $http_proxy` --build-arg https_proxy=`echo $https_proxy` -f barometer/docker/barometer-collectd/Dockerfile barometer/docker/barometer-collectd
+    - docker build -t opnfv/barometer-collectd -f barometer/docker/barometer-collectd/Dockerfile barometer/docker/barometer-collectd
 
   # Configuring collectd 
   - name: Ensure collectd is configured
@@ -46,6 +47,7 @@
   # Running Collectd container #####################
   - name: Running collectd
     command : chdir=/tmp/ {{ item }}
+    become: true
     with_items:
-    - sudo docker run -tid --net=host -v /tmp/barometer/docker/src/collectd_sample_configs:/opt/collectd/etc/collectd.conf.d -v /var/run:/var/run -v /tmp:/tmp --privileged opnfv/barometer-collectd /run_collectd.sh
-    - sudo docker ps
+    - docker run -tid --net=host -v /tmp/barometer/docker/src/collectd_sample_configs:/opt/collectd/etc/collectd.conf.d -v /var/run:/var/run -v /tmp:/tmp --privileged opnfv/barometer-collectd /run_collectd.sh
+    - docker ps
