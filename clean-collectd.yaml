@@ -2,6 +2,16 @@
 - hosts: localhost
 
   tasks:
+  - name: Check and install dependencies
+    yum:
+      name: docker
+      state: present
+  
+  - name: Install python sdk
+    yum:
+      name: python-docker-py
+      state: present
+
   - name: Stopping collectd container
     docker_container:
       name: collectd
