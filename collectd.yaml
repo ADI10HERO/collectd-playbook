@@ -44,6 +44,12 @@
           https_proxy: \`echo $https_proxy\`
       source: build
 
+  # Creating directory
+  - name: Create Folder
+    file: 
+      path: /tmp/barometer/docker/src/collectd_sample_configs
+      state: directory
+
   # Configuring collectd #######################
   - name: Ensure collectd is configured
     template:
