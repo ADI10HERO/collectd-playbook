@@ -29,11 +29,7 @@ LoadPlugin memory
 </Plugin>
 
 <Plugin network>
-  Server "10.10.120.22" "25826"
-</Plugin>
-
-<Plugin network>
-  Server "10.10.120.211" "30826"
+  Server "{{ server_ip }}" "{{ server_port }}"
 </Plugin>
 
 <Plugin ovs_stats>

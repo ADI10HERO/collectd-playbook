@@ -1,8 +1,15 @@
---- 
+---
+
 - hosts: localhost
   vars_prompt:
     - name: host_name
       prompt: "Enter host_name for collectd configuration"
+      private: no
+    - name: server_ip
+      prompt: "Enter server ip (probably of collectd-exporter) Eg. 10.10.120.211"
+      private: no
+    - name: server_port
+      prompt: "Enter port on which data is to be sent (default is 20826, or custom like 30826)"
       private: no
 
   tasks:
@@ -13,15 +20,6 @@
       name: ['epel-release', 'collectd']
       state: present
 
-  #Starting collectd service #################################
-  # - name: Starting and Enabling the required services
-  #   service:
-  #     name: "{{ item }}"
-  #     state: started
-  #     enabled: yes
-  #   with_items:
-  #     - collectd
-
   # Configuring collectd #######################
   - name: Ensure collectd is configured
     template:
@@ -29,13 +27,6 @@
       dest: /etc/collectd.conf
 
   # Starting collectd ######################
-  # - name: Stopping Collectd service
-  #   service:
-  #     name: "{{ item }}"
-  #     state: stopped
-  #     enabled: yes
-  #   with_items:
-  #     - collectd
 
   - name: Starting Collectd service
     service:
@@ -44,3 +35,11 @@
       enabled: yes
     with_items:
       - collectd
+
+  # - name: Stopping Collectd service
+  #   service:
+  #     name: "{{ item }}"
+  #     state: stopped
+  #     enabled: yes
+  #   with_items:
+  #     - collectd
