@@ -45,7 +45,7 @@
 
   # Running collectd #######################
   - name: Running collectd
-    docker_continer:
+    docker_container:
       name: collectd
       image: opnfv/barometer-collectd
       privileged: yes
