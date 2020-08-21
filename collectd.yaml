@@ -1,6 +1,5 @@
 --- 
 - hosts: localhost
-  #connection: local
   vars_prompt:
     - name: host_name
       prompt: "Enter host_name for collectd configuration"
@@ -27,7 +26,7 @@
   - name: Ensure collectd is configured
     template:
       src: collectd.conf.j2
-      dest: /opt/collectd/etc/collect.conf
+      dest: /etc/collect.conf
 
   #Restarting collectd ######################
   - name: Stopping Collectd service
