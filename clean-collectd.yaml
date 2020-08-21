@@ -1,0 +1,18 @@
+---
+
+- name: Stopping collectd container
+  docker_container:
+    name: collectd
+    state: stopped
+
+- name: Removing collectd container
+  docker_container:
+    name: collectd
+    state: absent
+
+# Removes the image (not recommended) 
+# - name: Remove image
+#   docker_image:
+#     state: absent
+#     name: opnfv/barometer-collectd
+#     tag: latest
