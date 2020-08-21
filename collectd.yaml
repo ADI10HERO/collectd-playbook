@@ -37,10 +37,10 @@
     with_items:
       - collectd
 
-  - name: Stopping Collectd service
+  - name: Starting Collectd service
     service:
       name: "{{ item }}"
-      state: stopped
+      state: started
       enabled: yes
     with_items:
       - collectd
