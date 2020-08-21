@@ -36,7 +36,8 @@
   # Build Docker Image ######################
   - name: Building docker image
     docker_image:
-      path: .
+      name: collectd
+      path: /tmp/barometer/docker/barometer-collectd/Dockerfile
       state: build
 
   # Configuring collectd #######################
