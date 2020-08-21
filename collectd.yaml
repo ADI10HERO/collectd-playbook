@@ -1,46 +1,47 @@
 --- 
+- hosts: localhost
+  #connection: local
+  vars_prompt:
+    - name: host_name
+      prompt: "Enter host_name for collectd configuration"
+      private: no
 
-vars_prompt:
-  - name: host_name
-    prompt: "Enter host_name for collectd configuration"
-    private: no
+  tasks:
 
-tasks:
+  #installing epel-release and collectd ############################
+  - name: Installing Collectd
+    yum:
+      name: ['epel-release', 'collectd']
+      state: present
 
-#installing epel-release and collectd ############################
-- name: Installing Collectd
-  yum:
-    name: ['epel-release', 'collectd']
-    state: present
+  #Starting collectd service #################################
+  - name: Starting and Enabling the required services
+    service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    with_items:
+      - collectd
 
-#Starting collectd service #################################
-- name: Starting and Enabling the required services
-  service:
-    name: "{{ item }}"
-    state: started
-    enabled: yes
-  with_items:
-    - collectd
+  #Configuring collectd #######################
+  - name: Ensure collectd is configured
+    template:
+      src: collectd.conf.j2
+      dest: /opt/collectd/etc/collect.conf
 
-#Configuring collectd #######################
-- name: Ensure collectd is configured
-  template:
-    src: collectd.conf.j2
-    dest: /opt/collectd/etc/collect.conf
+  #Restarting collectd ######################
+  - name: Stopping Collectd service
+    service:
+      name: "{{ item }}"
+      state: stopped
+      enabled: yes
+    with_items:
+      - collectd
 
-#Restarting collectd ######################
-- name: Stopping Collectd service
-  service:
-    name: "{{ item }}"
-    state: stopped
-    enabled: yes
-  with_items:
-    - collectd
-
-- name: Stopping Collectd service
-  service:
-    name: "{{ item }}"
-    state: stopped
-    enabled: yes
-  with_items:
-    - collectd
+  - name: Stopping Collectd service
+    service:
+      name: "{{ item }}"
+      state: stopped
+      enabled: yes
+    with_items:
+      - collectd
