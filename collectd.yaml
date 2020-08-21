@@ -7,35 +7,35 @@
 
   tasks:
 
-  #installing epel-release and collectd ############################
+  # Installing epel-release and collectd ############################
   - name: Installing Collectd
     yum:
       name: ['epel-release', 'collectd']
       state: present
 
   #Starting collectd service #################################
-  - name: Starting and Enabling the required services
-    service:
-      name: "{{ item }}"
-      state: started
-      enabled: yes
-    with_items:
-      - collectd
+  # - name: Starting and Enabling the required services
+  #   service:
+  #     name: "{{ item }}"
+  #     state: started
+  #     enabled: yes
+  #   with_items:
+  #     - collectd
 
-  #Configuring collectd #######################
+  # Configuring collectd #######################
   - name: Ensure collectd is configured
     template:
       src: collectd.conf.j2
       dest: /etc/collectd.conf
 
-  #Restarting collectd ######################
-  - name: Stopping Collectd service
-    service:
-      name: "{{ item }}"
-      state: stopped
-      enabled: yes
-    with_items:
-      - collectd
+  # Starting collectd ######################
+  # - name: Stopping Collectd service
+  #   service:
+  #     name: "{{ item }}"
+  #     state: stopped
+  #     enabled: yes
+  #   with_items:
+  #     - collectd
 
   - name: Starting Collectd service
     service:
