@@ -26,12 +26,6 @@
     git:
       repo: https://gerrit.opnfv.org/gerrit/barometer
       dest: /tmp/barometer
-  
-  # Configuring collectd #######################
-  - name: Ensure collectd is configured
-    template:
-      src: collectd.conf.j2
-      dest: /tmp/barometer/docker/src/collectd_sample_configs/collectd.conf
 
   # Change directory and copy config
   - name: Changing directory
@@ -44,6 +38,12 @@
     docker_image:
       path: .
       state: build
+
+  # Configuring collectd #######################
+  - name: Ensure collectd is configured
+    template:
+      src: collectd.conf.j2
+      dest: /tmp/barometer/docker/src/collectd_sample_configs/collectd.conf
 
   # Running collectd #######################
   - name: Running collectd
