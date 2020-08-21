@@ -49,5 +49,5 @@
     command : chdir=/tmp/ {{ item }}
     become: true
     with_items:
-    - docker run -tid --net=host -v /tmp/barometer/docker/src/collectd_sample_configs:/opt/collectd/etc/collectd.conf.d -v /var/run:/var/run -v /tmp:/tmp --privileged opnfv/barometer-collectd /run_collectd.sh
+    - docker run -tid --name collectd --net=host -v /tmp/barometer/docker/src/collectd_sample_configs:/opt/collectd/etc/collectd.conf.d -v /var/run:/var/run -v /tmp:/tmp --privileged opnfv/barometer-collectd /run_collectd.sh
     - docker ps
